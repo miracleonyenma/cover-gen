@@ -57,14 +57,6 @@ exports.handler = async function (event, context) {
 	// set the prefers-color-scheme to dark
 	await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
 
-	// try {
-	// } catch (err) {
-	//   console.log('unable to generate image', err)
-	// }
-
-	// await browser.close()
-
-	// navigate to target URL and get page details and screenshot
 	try {
 		//...
 		await page.goto(targetURL, {
@@ -91,15 +83,11 @@ exports.handler = async function (event, context) {
 			"titleInput",
 			await titleInput.evaluate((x) => {
 				return x.value;
-			})
-		);
-		console.log(
+			}),
 			"descInput",
 			await descInput.evaluate((x) => {
 				return x.value;
-			})
-		);
-		console.log(
+			}),
 			"dateInput",
 			await dateInput.evaluate((x) => {
 				return x.value;
@@ -108,40 +96,14 @@ exports.handler = async function (event, context) {
 
 		await h1.click();
 
-		// try {
-		// 	await fs.promises.access(`./public/img/miracleio.me/articles/${document.slug}/cover.png`);
-		// } catch (error) {
-		// 	console.log("ERROR --- fs.promises.access -->", error);
-
-		// 	try {
-		// 		await fs.promises.mkdir(`/public/img/miracleio.me/articles/${document.slug}`);
-		// 	} catch (err) {
-		// 		console.log(err, "unable to create path");
-		// 	}
-		// }
-
 		const screenshotBuffer = await page.screenshot({
 			encoding: "binary",
-			// path: `./public/img/miracleio.me/articles/${document.slug}/cover.png`,
 		});
 
 		const uploadOptions = {
 			folder: `miracleio.me/covers/${document.slug}`,
-			// public_id: `${document.slug}-${new Date().getTime()}`,
 			public_id: "cover",
 		};
-
-		// const uploadScreenshot = (screenshot, options) => {
-		// 	try {
-		// 		return cloudinary.uploader
-		// 			.upload_stream(uploadOptions, (error, result) => {
-		// 				return result;
-		// 			})
-		// 			.end(screenshotBuffer);
-		// 	} catch (err) {
-		// 		return err;
-		// 	}
-		// };
 
 		document.coverData = await uploadScreenshot(uploadOptions, screenshotBuffer);
 
