@@ -1,133 +1,47 @@
-const chromium = require("chrome-aws-lambda");
-const puppeteer = require("puppeteer-core");
-const fs = require("fs");
-const cloudinary = require("cloudinary").v2;
-
+const chromium = require("chrome-aws-lambda"),
+	puppeteer = require("puppeteer-core"),
+	fs = require("fs"),
+	cloudinary = require("cloudinary").v2;
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
 	api_key: process.env.CLOUDINARY_API_KEY,
 	api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-const uploadScreenshot = (options, screenshot) => {
-	return new Promise((resolve, reject) => {
-		options = options || {
-			folder: "screenshots",
-			public_id: `screenshot-${new Date().getTime()}`,
-		};
-
-		cloudinary.uploader
-			.upload_stream(options, (error, result) => {
-				if (error) reject(err);
-				else resolve(result);
-			})
-			.end(screenshot);
+const uploadScreenshot = (e, t) =>
+	new Promise((a, o) => {
+		(e = e || { folder: "screenshots", public_id: `screenshot-${new Date().getTime()}` }),
+			cloudinary.uploader
+				.upload_stream(e, (e, t) => {
+					e ? o(err) : a(t);
+				})
+				.end(t);
 	});
-};
-
-// const targetURL = process.env.COVER_GEN_URL || 'http://localhost:3000';
-exports.handler = async function (event, context) {
-	// parse body of POST request to valid object and
-	// use object destructuring to obtain target url
-	const { targetURL, document } = JSON.parse(event.body);
-	console.log("--> chromium.executablePath", await chromium.executablePath);
-	console.log("--> process.env.EXCECUTABLE_PATH", process.env.EXCECUTABLE_PATH);
-
-	// launch browser
-	const browser = await puppeteer.launch({
-		args: chromium.args,
-		// get path to browser
-		executablePath: await chromium.executablePath,
-		headless: true,
-	});
-
-	console.log(browser.isConnected(), await browser.version());
-
-	// open new page in browser
-	const page = await browser.newPage();
-	console.log(await page.title());
-
-	// set the viewport of the page
-	await page.setViewport({
-		width: 1200,
-		height: 628,
-		deviceScaleFactor: 1,
-	});
-
-	// set the prefers-color-scheme to dark
-	await page.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
-
+exports.handler = async function (e, t) {
+	const { targetURL: a, document: o } = JSON.parse(e.body),
+		r = await puppeteer.launch({ args: chromium.args, executablePath: await chromium.executablePath, headless: !0 });
+	console.log(r.isConnected(), await r.version());
+	const i = await r.newPage();
+	console.log(await i.title()),
+		await i.setViewport({ width: 1200, height: 628, deviceScaleFactor: 1 }),
+		await i.emulateMediaFeatures([{ name: "prefers-color-scheme", value: "dark" }]);
 	try {
-		//...
-		await page.goto(targetURL, {
-			timeout: 0,
-		});
-
-		const formCont = await page.waitForSelector("#form-cont", {
-			hidden: true,
-		});
-
-		const h1 = await page.waitForSelector("#content h1");
-
-		await h1.click();
-
-		const titleInput = await page.waitForSelector("#title");
-		const descInput = await page.waitForSelector("#description");
-		const dateInput = await page.waitForSelector("#updatedAt");
-
-		await titleInput.type(`${document.title}`);
-		await descInput.type(`${document.description}`);
-		await dateInput.type(`${document.updatedAt}`);
-
-		console.log(
-			"titleInput",
-			await titleInput.evaluate((x) => {
-				return x.value;
-			}),
-			"descInput",
-			await descInput.evaluate((x) => {
-				return x.value;
-			}),
-			"dateInput",
-			await dateInput.evaluate((x) => {
-				return x.value;
-			})
+		await i.goto(a, { timeout: 0 });
+		await i.waitForSelector("#form-cont", { hidden: !0 });
+		const e = await i.waitForSelector("#content h1");
+		await e.click();
+		const t = await i.waitForSelector("#title"),
+			c = await i.waitForSelector("#description"),
+			s = await i.waitForSelector("#updatedAt");
+		await t.type(`${o.title}`), await c.type(`${o.description}`), await s.type(`${o.updatedAt}`), await e.click();
+		const n = await i.screenshot({ encoding: "binary" }),
+			l = { folder: `miracleio.me/covers/${o.slug}`, public_id: "cover" };
+		return (
+			(o.coverData = await uploadScreenshot(l, n)),
+			console.log(o.coverData),
+			await r.close(),
+			{ statusCode: 200, body: JSON.stringify({ targetURL: a, coverData: o.coverData }) }
 		);
-
-		await h1.click();
-
-		const screenshotBuffer = await page.screenshot({
-			encoding: "binary",
-		});
-
-		const uploadOptions = {
-			folder: `miracleio.me/covers/${document.slug}`,
-			public_id: "cover",
-		};
-
-		document.coverData = await uploadScreenshot(uploadOptions, screenshotBuffer);
-
-		console.log(document.coverData);
-		// close the browser
-		await browser.close();
-
-		// send the page details
-		return {
-			statusCode: 200,
-			body: JSON.stringify({
-				targetURL,
-				coverData: document.coverData,
-			}),
-		};
-	} catch (err) {
-		console.log(err);
-		await browser.close();
-
-		return {
-			statusCode: 400,
-			body: JSON.stringify({
-				err,
-			}),
-		};
+	} catch (e) {
+		return console.log(e), await r.close(), { statusCode: 400, body: JSON.stringify({ err: e }) };
 	}
 };
