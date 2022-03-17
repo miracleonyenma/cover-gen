@@ -1,6 +1,9 @@
 const chromium = require("chrome-aws-lambda");
 const puppeteer = require("puppeteer-core");
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config(require("../../cloudinary.config"));
 
 const uploadScreenshot = (options, screenshot) => {
 	return new Promise((resolve, reject) => {
