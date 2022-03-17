@@ -2,15 +2,21 @@ const chromium = require("chrome-aws-lambda");
 const puppeteer = require("puppeteer-core");
 const fs = require("fs");
 
-// const cloudinary = require("cloudinary").v2; // Make sure to use v2
+const uploadScreenshot = (options, screenshot) => {
+	return new Promise((resolve, reject) => {
+		options = options || {
+			folder: "screenshots",
+			public_id: `screenshot-${new Date().getTime()}`,
+		};
 
-// cloudinary.config({
-// 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-// 	api_key: process.env.CLOUDINARY_API_KEY,
-// 	api_secret: process.env.CLOUDINARY_API_SECRET,
-// });
-
-const uploadScreenshot = require("./modules/uploadScreenshot");
+		cloudinary.uploader
+			.upload_stream(options, (error, result) => {
+				if (error) reject(err);
+				else resolve(result);
+			})
+			.end(screenshot);
+	});
+};
 
 // const targetURL = process.env.COVER_GEN_URL || 'http://localhost:3000';
 exports.handler = async function (event, context) {
