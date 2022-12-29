@@ -6,14 +6,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        header: [
-          'Source Sans Pro',
-          ...defaultTheme.fontFamily.sans,
-        ],
-        sans: [
-          'Lato',
-          ...defaultTheme.fontFamily.sans,
-        ]
+        sans: ["Work Sans", ...defaultTheme.fontFamily.sans],
+        // heading: ["Syne", ...defaultTheme.fontFamily.sans],
+        header: ["Hepta Slab", ...defaultTheme.fontFamily.sans],
       },
       spacing: {
         '102': '28rem',

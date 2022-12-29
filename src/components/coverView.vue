@@ -2,52 +2,32 @@
   <section class="w-full h-full bg-gray-100 dark:bg-gray-800">
     <div id="form-cont"
       class=" form absolute invisible flex flex-wrap gap-2 top-16 left-16 w-96 bg-white dark:bg-gray-700 p-4 rounded-lg shadow-md z-20"
-      :class="{formShow: formActive}"
-    >
+      :class="{ formShow: formActive }">
       <div class="input-cont flex items-center w-full gap-2">
         <label for="title" class="font-header font-semibold">Title</label>
-        <input
-          type="text"
-          id="title"
-          class="p-1 pl-2 w-full bg-gray-200 dark:bg-gray-600 text-white rounded-md"
-          v-model="articleData.title"
-        />
+        <input type="text" id="title" class="p-1 pl-2 w-full bg-gray-200 dark:bg-gray-600 text-white rounded-md"
+          v-model="articleData.title" />
       </div>
       <div class="input-cont flex items-center w-full gap-2">
-        <label for="description" class="font-header font-semibold"
-          >Description</label
-        >
-        <input
-          type="text"
-          id="description"
-          class="p-1 pl-2 w-full bg-gray-200 dark:bg-gray-600 text-white rounded-md"
-          v-model="articleData.description"
-        />
+        <label for="description" class="font-header font-semibold">Description</label>
+        <input type="text" id="description" class="p-1 pl-2 w-full bg-gray-200 dark:bg-gray-600 text-white rounded-md"
+          v-model="articleData.description" />
       </div>
       <div class="input-cont flex items-center w-full gap-2">
-        <label for="updatedAt" class="font-header font-semibold"
-          >updatedAt</label
-        >
-        <input
-          type="text"
-          id="updatedAt"
-          class="p-1 pl-2 w-full bg-gray-200 dark:bg-gray-600 text-white rounded-md"
-          v-model="articleData.updatedAt"
-        />
+        <label for="updatedAt" class="font-header font-semibold">updatedAt</label>
+        <input type="text" id="updatedAt" class="p-1 pl-2 w-full bg-gray-200 dark:bg-gray-600 text-white rounded-md"
+          v-model="articleData.updatedAt" />
       </div>
     </div>
     <div id="content" class="wrapper relative h-full w-full grid grid-cols-5">
       <header class="h-full w-full col-span-3 flex items-center justify-start">
         <div class="hero-header">
-          <h1 id="title-text"
-            class="
-              font-black font-header
+          <h1 id="title-text" class="
+              font-bold font-header
               text-left text-7xl
               dark:text-gray-100
               cursor-pointer
-            "
-            @click="toggleDisplayReset()"
-          >
+            " @click="toggleDisplayReset()">
             {{ articleData.title }}
           </h1>
           <p id="description-text" class="dark:text-gray-200">
@@ -60,7 +40,15 @@
       </div>
       <footer class="absolute bottom-16 left-0 dark:text-gray-100 text-lg">
         <span id="author-text" class="mr-4">{{ articleData.author }}</span>
-        <span>{{ formatDate(articleData.updatedAt) }}</span>
+        <!-- <div class="detail-item date">
+          <CalendarIcon class="icon" /> -->
+        <time :datetime="articleData.updatedAt">
+          {{
+    formatDate(articleData.updatedAt)
+          }}
+        </time>
+        <!-- </div> -->
+
       </footer>
     </div>
   </section>
@@ -69,6 +57,7 @@
 <script>
 import Logo from "./Logo.vue";
 import { ref } from "vue";
+// import { CalendarIcon } from "@heroicons/vue/24/solid/index"
 
 export default {
   name: "coverView",
@@ -85,14 +74,14 @@ export default {
     const formActive = ref(false);
 
     const toggleDisplayReset = () => {
-        formActive.value = !formActive.value
+      formActive.value = !formActive.value
 
-        if (formActive.value){
-            articleData.value.title = ""
-            articleData.value.description = ""
-            articleData.value.updatedAt = ""
-        }
-        // articleData.value.title = ""
+      if (formActive.value) {
+        articleData.value.title = ""
+        articleData.value.description = ""
+        articleData.value.updatedAt = ""
+      }
+      // articleData.value.title = ""
     }
 
     const formatDate = (date) => {
@@ -113,7 +102,12 @@ export default {
 .giant-logo:deep() svg {
   @apply w-134 h-134 transform origin-top -rotate-12 filter drop-shadow-2xl;
 }
-.formShow{
-    visibility: visible!important;
+
+.formShow {
+  visibility: visible !important;
+}
+
+.detail-item {
+  @apply flex items-start sm:items-center gap-2 font-header font-semibold text-xs;
 }
 </style>
