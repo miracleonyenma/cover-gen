@@ -9,9 +9,9 @@
   "dependencies": {
     "@heroicons/vue": "^2.0.13",
     "@vueuse/head": "^0.6.0",
-    "chrome-aws-lambda": "^10.1.0",
+
     "cloudinary": "^1.28.1",
-    "puppeteer-core": "^13.5.1",
+
     "vite-ssr": "^0.13.0",
     "vue": "^3.2.4",
     "vue-router": "^4.0.11"
